@@ -1,0 +1,31 @@
+       +----------------------+
+       |   Mobile App         |
+       | (User's Device)      |
+       +----------------------+
+                |
+                |  Scans QR code & sends authentication request
+                v
+       +---------------------------+
+       | Central Server/Backend    |
+       | (Authentication, validation, log) |
+       +---------------------------+
+                |    ^
+                |    | Generates dynamic QR code update
+                v    |
+       +---------------------------+
+       | Embedded Device           |
+       | (E-Paper Display)         |
+       +---------------------------+
+                |
+                | Receives unlock command and triggers door action
+                v
+       +---------------------+
+       | Door Lock Mechanism |
+       +---------------------+
+                |
+                | Logs access events
+                v
+       +-------------------------+
+       | Access Log Database     |
+       +-------------------------+
+

@@ -1,0 +1,35 @@
+          +---------+
+          |  User   |
+          +---------+
+               |
+               v
+       +-----------------+
+       |  Mobile App     | <-- Scans QR code from Embedded Device
+       +-----------------+
+               |
+               | Sends authentication token
+               v
+       +---------------------------+
+       | Central Server/Backend    |---+
+       | (Validates token, logs event)   |  Queries for user credentials
+       +---------------------------+   |
+               |                      |
+               | If valid, sends unlock command
+               v                      |
+       +---------------------------+    |
+       | Embedded Device           |<---+
+       | (Displays QR code & triggers door)
+       +---------------------------+
+               |
+               | Activates door unlock
+               v
+       +---------------------+
+       | Door Lock Mechanism |
+       +---------------------+
+               |
+               | Logs access event
+               v
+       +-------------------------+
+       | Access Log Database     |
+       +-------------------------+
+
