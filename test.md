@@ -1,0 +1,30 @@
+```plantuml
+@startuml
+actor User
+participant "Mobile App" as MA
+participant "Central Server/Backend" as CS
+participant "Embedded Device\n(E-Paper Display)" as ED
+participant "Door Lock Mechanism" as DL
+participant "Access Log Database" as AL
+
+' --- First Scan & Authentication ---
+User -> MA: Scan initial QR code
+MA -> CS: Send initial authentication token
+CS -> ED: Generate & display validation QR code
+
+' --- Validation Step ---
+ED -> MA: Update display with validation QR code
+User -> MA: Scan validation QR code
+MA -> CS: Send validation token
+
+' --- Validation Outcome ---
+CS -> CS: Validate token
+alt Token valid
+  CS -> ED: Send unlock command
+  ED -> DL: Trigger door unlock
+  CS -> AL: Log access event
+else Token invalid
+  CS -> MA: Return error message
+end
+@enduml
+
