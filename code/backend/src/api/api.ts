@@ -1,5 +1,6 @@
-interface QRCode {
-    qrCode: string
+interface QRCode { 
+    qrCode: string 
 }
+
 
 export { QRCode }
