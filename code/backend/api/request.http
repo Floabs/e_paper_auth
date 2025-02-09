@@ -1,0 +1,27 @@
+@BACKEND=http://localhost:4200
+@CONTROLLER=http://localhost:3000
+
+########## backend #######
+GET {{BACKEND}}/flo
+Accept: application/json
+###
+POST {{BACKEND}}/verify
+Content-Type: application/json
+Accept: appliction/json
+Authorization: Bearer qwslkdcnsakccnkasndcklasncklasnclkascnklsda
+
+{
+}
+
+############# controller ########
+###
+GET {{CONTROLLER}}/
+###
+PUT {{CONTROLLER}}/code
+Content-Type: application/json
+Accept: application/json
+
+{
+    "qrCode": "THIS IS THE CODE TO QR"
+}
+
