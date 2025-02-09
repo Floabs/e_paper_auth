@@ -4,32 +4,72 @@
                |
                v
        +-----------------+
-       |  Mobile App     | <-- Scans QR code from Embedded Device
+       |  Mobile App     |
        +-----------------+
                |
-               | Sends authentication token
+   (1) Scans initial QR code displayed on 
+       Embedded Device (EPD)
+               |
+               v
+       +-----------------+
+       | Embedded Device |
+       | (E-Paper Disp.) |
+       +-----------------+
+               |
+   (2) Initial QR code already displayed
+               |
+               v
+       +-----------------+
+       |  Mobile App     |
+       +-----------------+
+               |
+   (3) Sends initial auth token to
                v
        +---------------------------+
-       | Central Server/Backend    |---+
-       | (Validates token, logs event)   |  Queries for user credentials
-       +---------------------------+   |
-               |                      |
-               | If valid, sends unlock command
-               v                      |
-       +---------------------------+    |
-       | Embedded Device           |<---+
-       | (Displays QR code & triggers door)
+       | Central Server/Backend    |
        +---------------------------+
                |
-               | Activates door unlock
+   (4) Generates validation QR code and sends update to
                v
-       +---------------------+
-       | Door Lock Mechanism |
-       +---------------------+
+       +-----------------+
+       | Embedded Device |
+       | (E-Paper Disp.) |
+       +-----------------+
                |
-               | Logs access event
+   (5) Mobile App scans the validation QR code
+               |
                v
-       +-------------------------+
-       | Access Log Database     |
-       +-------------------------+
+       +-----------------+
+       |  Mobile App     |
+       +-----------------+
+               |
+   (6) Sends validation token to
+               v
+       +---------------------------+
+       | Central Server/Backend    |
+       +---------------------------+
+               |
+   (7) If valid, sends unlock command to
+               v
+       +-----------------+
+       | Embedded Device |
+       +-----------------+
+               |
+   (8) Embedded Device triggers door unlock
+               v
+       +-------------------+
+       | Door Lock Mechanism|
+       +-------------------+
+               |
+   (9) Logs access event to
+               v
+       +-------------------+
+       | Access Log DB     |
+       +-------------------+
 
+QR Code Scan: 		The user uses the Mobile App to scan the initial QR code from the Embedded Device’s E-Paper Display.
+Authentication Request:	The Mobile App sends the initial authentication token to the Central Server/Backend.
+Validation Step:	The server generates a validation QR code and sends it to the Embedded Device, which updates its display.
+Second Scan: 		The Mobile App then scans the updated (validation) QR code and sends a validation token back to the server.
+Unlock Command: 	Upon successful validation, the server sends an unlock command to the Embedded Device, which triggers the Door Lock Mechanism.
+Logging:		The entire access event is logged into the Access Log Database for audit purposes.
