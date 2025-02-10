@@ -1,4 +1,4 @@
-@startuml
+@startuml espsequence
 actor User
 participant "Mobile App" as MA
 participant "Central Server/Backend" as CS
