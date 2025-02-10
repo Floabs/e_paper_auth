@@ -19,6 +19,20 @@ app.put("/code", (req, res) => {
   res.status(204).send();
 });
 
+// NEW: POST endpoint to handle door unlock command
+app.post("/unlock", (req, res) => {
+    const { command } = req.body;
+    console.log("Unlock command received:", req.body);
+    if (command === "unlock") {
+      // Here you would add your hardware interfacing code to unlock the door.
+      // For now, we simulate the unlock with a log message.
+      console.log("Door unlocked successfully.");
+      res.status(200).json({ message: "Door unlocked." });
+    } else {
+      res.status(400).json({ error: "Invalid command" });
+    }
+  });
+
 app.listen(port, () => {
   console.log(`Controller listening on port ${port}`);
 });

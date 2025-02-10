@@ -77,29 +77,24 @@ app.post("/api/initial-scan", async (req: Request, res: Response) => {
  * - Compares it with the token stored in the session.
  * - If valid, updates session.stage to "validated" and simulates unlocking the door.
  */
-app.post("/api/validate-scan", (req: Request, res: Response) => {
+app.post("/api/validate-scan", async (req: Request, res: Response) => {
     const { token: scannedToken } = req.body;
     if (!scannedToken) {
       return res.status(400).json({ error: "Missing validation token" });
     }
-    
     if (!req.session || req.session.stage !== "awaitingValidation") {
       return res.status(400).json({ error: "Session not in validation stage" });
     }
-    
-    // Define the expected prefix and suffix
+  
     const prefix = "QR-VALID-";
     const suffix = "-RQ";
-    
-    // Check if the scanned token has the expected format
+  
     if (scannedToken.startsWith(prefix) && scannedToken.endsWith(suffix)) {
-      // Extract the actual token value between the prefix and suffix
       const extractedToken = scannedToken.substring(prefix.length, scannedToken.length - suffix.length);
-      
       if (extractedToken === req.session.validationToken) {
         req.session.stage = "validated";
-        console.log("Validation successful, door unlocked");
-        // TODO: Trigger door unlock mechanism here.
+        console.log("Validation successful, door unlocking...");
+        await unlockDoor();
         return res.status(200).json({ message: "Validation successful, door unlocked." });
       } else {
         return res.status(400).json({ error: "Validation token mismatch" });
@@ -108,6 +103,17 @@ app.post("/api/validate-scan", (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid token format" });
     }
   });
+  
+  async function unlockDoor(): Promise<void> {
+    const url = `${config.displayControllerURL}/unlock`;
+    console.log("Sending unlock command to controller at", url);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ command: "unlock" })
+    });
+    console.log("Unlock command response status:", response.status);
+  }
 
 // POST endpoint at "/verify"
 // This endpoint reads an authorization header, logs the token, creates a QR code payload, and sends it to the controller.
@@ -119,7 +125,6 @@ app.post("/verify", async (req: Request, res: Response) => {
     if (authHeader) {
       const accessToken = authHeader.replace("Bearer ", "");
       console.log("credentials received:", accessToken);
-  
       // TODO: Here you would normally verify the bearer token and perform additional actions.
   
       // Create a QR code payload using the access token
@@ -140,6 +145,7 @@ app.post("/verify", async (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Backend listening on port ${port}`);
 });
+
 
 /**
  * sendQRToController:
