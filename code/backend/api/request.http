@@ -30,6 +30,7 @@ Accept: application/json
 POST {{BACKEND}}/api/initial-scan
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer qwslkdcnsakccnkasndcklasncklasnclkascnklsda
 
 {
   "token": "initialTokenExample"
@@ -45,7 +46,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "token": "QR-VALID-5db970f0-006a-404d-b34c-d8c8f6780510-RQ"
+  "token": "26c0bcf0-b03c-4405-88d4-d2fb07cea226"
 }
 ###
 # Expected response on success: { "message": "Validation successful, door unlocked." }
