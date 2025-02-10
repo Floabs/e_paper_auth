@@ -25,3 +25,27 @@ Accept: application/json
     "qrCode": "THIS IS THE CODE TO QR"
 }
 
+### POST /api/initial-scan
+# Sends an initial token to start the process.
+POST {{BACKEND}}/api/initial-scan
+Content-Type: application/json
+Accept: application/json
+
+{
+  "token": "initialTokenExample"
+}
+###
+# Expected response: { "message": "Initial scan processed. Await validation scan." }
+# Also, the backend logs a generated validation token and sends a validation QR payload to the controller.
+
+### POST /api/validate-scan
+# Replace the token below with the validation token received from the initial scan (e.g., "QR-VALID-<token>-RQ" includes the token).
+POST {{BACKEND}}/api/validate-scan
+Content-Type: application/json
+Accept: application/json
+
+{
+  "token": "QR-VALID-5db970f0-006a-404d-b34c-d8c8f6780510-RQ"
+}
+###
+# Expected response on success: { "message": "Validation successful, door unlocked." }
