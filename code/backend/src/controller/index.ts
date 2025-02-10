@@ -2,6 +2,7 @@
 const express = require('express');
 const qrcode = require('qrcode');
 const fs = require('fs');
+const path = require('path');
 const app = express();
 const port = 3000;
 
@@ -19,7 +20,8 @@ app.get('/', (req, res) => {
 /**
  * PUT /code
  * Receives a JSON payload with a "qrCode" string,
- * converts it to a QR code image, and simulates displaying it on an e-paper.
+ * converts it to a QR code image, saves it as "qrcode.png"
+ * in the controller directory, and simulates displaying it on an e-paper.
  */
 app.put('/code', async (req, res) => {
   const { qrCode } = req.body;
@@ -33,11 +35,12 @@ app.put('/code', async (req, res) => {
     // Generate QR code as a Data URL (PNG format)
     const qrDataUrl = await qrcode.toDataURL(qrCode);
     
-    // Convert Data URL to base64 and write to file (simulate display output)
+    // Convert Data URL to base64 and write to file in the controller directory
     const base64Data = qrDataUrl.replace(/^data:image\/png;base64,/, "");
-    fs.writeFileSync('qrcode.png', base64Data, 'base64');
+    const filePath = path.join(__dirname, 'qrcode.png');
+    fs.writeFileSync(filePath, base64Data, 'base64');
     
-    console.log('QR code image generated and saved as qrcode.png');
+    console.log('QR code image generated and saved as', filePath);
     
     // Here, replace this with code to display the image on your e-paper display.
     console.log('QR code is now displayed on the e-paper display.');
@@ -50,16 +53,27 @@ app.put('/code', async (req, res) => {
 });
 
 /**
+ * GET /qrcode
+ * Serves the generated "qrcode.png" image so that it can be viewed in a browser.
+ */
+app.get('/qrcode', (req, res) => {
+  const filePath = path.join(__dirname, 'qrcode.png');
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: "QR code image not found" });
+  }
+});
+
+/**
  * POST /unlock
- * (Optional) Endpoint to simulate door unlocking.
- * This might be used by the backend's unlockDoor function.
+ * Receives an unlock command and simulates door unlocking.
  */
 app.post('/unlock', (req, res) => {
   const { command } = req.body;
   console.log('Unlock command received:', req.body);
   if (command === 'unlock') {
-    // Here you would add hardware-specific logic to physically unlock the door.
-    // For now, we simulate the unlock with a log message.
+    // Insert hardware-specific logic to physically unlock the door.
     console.log('Door unlocked successfully.');
     res.status(200).json({ message: 'Door unlocked.' });
   } else {
