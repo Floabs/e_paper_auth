@@ -43,19 +43,20 @@ app.use(
  * - Generates a unique validation token and sets session.stage to "awaitingValidation".
  * - Sends a validation QR code payload (as a string) to the controller (embedded device).
  */
-app.post("/api/initial-scan", async (req: Request res: Response) => {
+app.post("/api/initial-scan", async (req: Request, res: Response) => {
     const { token: initialToken } = req.body
     if (!initialToken) {
-        return res.status(401).json({ error: "Missing initial token" })
+        res.status(401)
+        res.send({ error: "Missing initial token" })
     }
-
+    const session = req.session as any
     // Store the initial token in the session
-    req.session.initialToken = initialToken
+    session.initialToken = initialToken
 
     // Generate a validation token using uuidv4
     const validationToken = uuidv4()
-    req.session.validationToken = validationToken
-    req.session.stage = "awaitingValidation"
+    session.validationToken = validationToken
+    session.stage = "awaitingValidation"
 
     // Create the validation QR payload (a simple string your controller converts it into a QR code)
     const code: QRCode = {
@@ -84,7 +85,8 @@ app.post("/api/validate-scan", async (req: Request, res: Response) => {
         res.send({ error: "Missing validation token" })
         return
     }
-    if (!req.session || req.session.stage !== "awaitingValidation") {
+    const session = req.session as any
+    if (!req.session || session.stage !== "awaitingValidation") {
         res.status(400)
         res.send({ error: "Session not in validation stage" })
         return
@@ -95,8 +97,8 @@ app.post("/api/validate-scan", async (req: Request, res: Response) => {
 
     if (scannedToken.startsWith(prefix) && scannedToken.endsWith(suffix)) {
         const extractedToken = scannedToken.substring(prefix.length, scannedToken.length - suffix.length)
-        if (extractedToken === req.session.validationToken) {
-            req.session.stage = "validated"
+        if (extractedToken === session.validationToken) {
+            session.stage = "validated"
             console.log("Validation successful, door unlocking...")
             await unlockDoor()
             res.send({ message: "Validation successful, door unlocked." })
