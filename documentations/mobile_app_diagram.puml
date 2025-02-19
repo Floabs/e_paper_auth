@@ -1,0 +1,37 @@
+@startuml
+actor User
+participant "Mobile App" as App
+participant "Backend" as Backend
+participant "SMS Service" as SMS
+
+User -> App: Open app
+App -> Backend: Check if device is registered
+
+alt Device is registered
+    App -> Backend: Check if user session is active
+    alt Session Active
+        App -> User: Prompt QR code scanner
+    else Session Inactive
+        App -> User: Prompt login (or auto-login if credentials stored)
+        App -> User: Then prompt QR code scanner
+    end
+else Device is not registered
+    App -> User: Show options:\n[Register Phone] [Register at Gym]
+    alt User selects "Register Phone"
+        App -> SMS: Request OTP SMS to registered phone number
+        SMS -> User: Send OTP SMS
+        User -> App: Enter OTP
+        App -> Backend: Validate OTP
+        alt OTP valid
+            App -> Backend: Register device for user\n(Delete old device if exists, increment switch count)
+            App -> User: Registration successful,\nProceed to login & QR code scanner
+        else OTP invalid
+            App -> User: Display OTP error,\nTry again
+        end
+    else User selects "Register at Gym"
+        App -> User: Redirect to Gym registration URL
+    end
+end
+
+@enduml
+
